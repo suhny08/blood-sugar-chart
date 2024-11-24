@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>혈당 모니터링 차트</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        .chart-container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 20px auto;
+            height: 600px;
+        }
+        h1 {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>혈당 모니터링 차트</h1>
+    <div class="chart-container">
+        <canvas id="bloodSugarChart"></canvas>
+    </div>
+
+    <script>
+        const data = [
+            { time: "09:54", value: 90 },
+            { time: "10:08", value: 74 },
+            { time: "10:51", value: 89 },
+            { time: "11:39", value: 76, note: "(점심)식사 중간/토마토파스타" },
+            { time: "11:49", value: 93, note: "(점심)식사 직후/토마토파스타" },
+            { time: "12:27", value: 175 },
+            { time: "13:12", value: 54, note: "?" },
+            { time: "14:20", value: 83 },
+            { time: "15:26", value: 84, note: "간식/파란색 포카칩" },
+            { time: "15:54", value: 127 },
+            { time: "15:59", value: 154, note: "(아큐첵) 147" },
+            { time: "16:09", value: 179 },
+            { time: "16:10", value: 166 },
+            { time: "16:26", value: 103 },
+            { time: "16:29", value: 76 },
+            { time: "16:31", value: 67 },
+            { time: "16:35", value: 60 },
+            { time: "16:38", value: 57 },
+            { time: "17:04", value: 78 },
+            { time: "17:32", value: 94, note: "(저녁) 식사 시작/김치찌개, 잡곡밥" },
+            { time: "17:42", value: 85, note: "(저녁) 식사 끝/김치찌개, 잡곡밥" },
+            { time: "18:03", value: 149 },
+            { time: "18:08", value: 147, note: "(아큐첵) 223" },
+            { time: "18:44", value: 256 },
+            { time: "18:45", value: 240 },
+            { time: "18:48", value: 217 },
+            { time: "19:27", value: 58 },
+            { time: "19:28", value: 58 },
+            { time: "19:43", value: 57 },
+            { time: "19:46", value: 65 },
+            { time: "19:57", value: 76, note: "간식/쌀과자 한개" },
+            { time: "20:01", value: 80 },
+            { time: "20:20", value: 97, note: "간식/요아정 5입" },
+            { time: "20:48", value: 97 },
+            { time: "21:01", value: 115 },
+            { time: "21:08", value: 124 },
+            { time: "21:16", value: 114 },
+            { time: "21:49", value: 90, note: "간식/만두 1개" },
+            { time: "21:58", value: 104 },
+            { time: "22:09", value: 112, note: "간식/만두 1/2개" },
+            { time: "22:21", value: 104, note: "간식/만두 1/2개" },
+            { time: "22:39", value: 129 },
+            { time: "22:46", value: 119 },
+            { time: "22:58", value: 118 }
+        ];
+
+        const ctx = document.getElementById('bloodSugarChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(item => item.time),
+                datasets: [{
+                    label: '혈당 수치',
+                    data: data.map(item => item.value),
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    pointRadius: data.map(item => item.note ? 8 : 5),
+                    pointBackgroundColor: data.map(item => item.note ? 'rgb(255, 99, 132)' : 'rgb(75, 192, 192)'),
+                    pointBorderColor: data.map(item => item.note ? 'rgb(255, 99, 132)' : 'rgb(75, 192, 192)'),
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            generateLabels: function(chart) {
+                                const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                                original.push({
+                                    text: '비고 있음',
+                                    fillStyle: 'rgb(255, 99, 132)',
+                                    strokeStyle: 'rgb(255, 99, 132)',
+                                    lineWidth: 0,
+                                    hidden: false,
+                                    index: 1
+                                });
+                                return original;
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                const dataPoint = data[context.dataIndex];
+                                return dataPoint.note ? `비고: ${dataPoint.note}` : '';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 300,
+                        title: {
+                            display: true,
+                            text: '혈당 (mg/dL)'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
